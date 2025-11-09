@@ -402,13 +402,6 @@
                     event.preventDefault();
                     botao.disabled = true;
                     botao.innerHTML = 'Gerando PIX...';
-
-                    // ✅ MARCA AddToCart NO FACEBOOK PIXEL (MANTIDO)
-                    if (typeof fbq === 'function') {
-                            currency: "BRL",
-                            value: 19.99 // ✅ VALOR CORRETO R$ 19,99
-                        });
-                    }
 try {
     const response = await fetch(`${backendUrl}/gerar-pix`, { method: 'POST' });
     if (!response.ok) throw new Error('Falha na comunicação com o servidor.');
