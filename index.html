@@ -210,6 +210,14 @@
         ];
         // ---- FIM: PERSONALIZE A CONVERSA AQUI ----
 
+        // --- FUNÇÃO PARA LER COOKIES (ESSENCIAL) ---
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
         async function obterLocalizacaoComDDD() {
             try {
                 const response = await fetch('https://get.geojs.io/v1/ip/geo.json');
@@ -400,14 +408,27 @@
                     event.preventDefault();
                     botao.disabled = true;
                     botao.innerHTML = 'Gerando PIX...';
+                    
+                    // 1. LER OS COOKIES DE ATRIBUIÇÃO DO FACEBOOK
+                    const fbp = getCookie('_fbp');
+                    const fbc = getCookie('_fbc');
 
-                    // 
-                    // CORREÇÃO 4: Bloco do AddToCart que estava aqui FOI REMOVIDO.
-                    // A Utmify agora cuida disso.
-                    // 
-
+                    // O AddToCart FOI REMOVIDO DAQUI
+                    // O script pixel.js da Utmify vai cuidar disso
+                    
 try {
-    const response = await fetch(`${backendUrl}/gerar-pix`, { method: 'POST' });
+    // 2. ENVIAR OS COOKIES PARA O BACKEND
+    const response = await fetch(`${backendUrl}/gerar-pix`, { 
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            fbp: fbp,
+            fbc: fbc
+        })
+    });
+
     if (!response.ok) throw new Error('Falha na comunicação com o servidor.');
     const data = await response.json();
 
@@ -446,10 +467,8 @@ try {
                 document.getElementById('payment-qr').classList.add('hidden');
                 document.getElementById('payment-success').classList.remove('hidden');
 
-                // ❌ REMOVIDO: Purchase do frontend (agora só no backend)
-                // if (typeof fbq === 'function') {
-                //    fbq('track', 'Purchase', {currency: "BRL", value: 19.99});
-                // }
+                // O 'Purchase' FOI REMOVIDO DAQUI
+                // O backend vai cuidar disso 100%
                 
                 document.getElementById('access-button').href = linkDeDestino;
             }
@@ -466,7 +485,7 @@ try {
     botao.innerHTML = 'Entrar no Grupo';
 }
 
-// Dispara pixels de marketing
+// Dispara pixels de marketing (Exib.io, etc)
 const goal1 = "SEU_GOAL_ID_AQUI";
 const goal2 = "SEU_GOAL_ID_AQUI";
 const exoPixel1 = document.createElement('script');
